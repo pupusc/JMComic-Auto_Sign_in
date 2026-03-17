@@ -1,7 +1,8 @@
 import requests
 import json
+import os
 #如果运行报错可能是换域名了，进官网会自动重定向新的域名，把老的换成新的域名后面路径不用改
-#JM域名:    18comic-blackmyth.club/login        ->      18comic-hok.xyz/login
+#JM 域名：18comic-blackmyth.club/login        ->      18comic-hok.xyz/login
 LOGIN_URL = 'https://18comic-hok.xyz/login'                      # 登录URL
 SIGN_URL = 'https://18comic-hok.xyz/ajax/user_daily_sign'        # 签到URL
 LOGOUT_URL = 'https://18comic-hok.xyz/logout'                    # 退出URL
@@ -12,10 +13,10 @@ headers = {
     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
 }
 
-# 用户名和密码
+# 用户名和密码 - 优先从环境变量读取，支持 GitHub Actions
 payload = {
-    'username': 'username',
-    'password': 'password',
+    'username': os.getenv('JM_USERNAME', 'username'),
+    'password': os.getenv('JM_PASSWORD', 'password'),
     'submit_login': '1',
 }
 
@@ -83,11 +84,3 @@ with requests.Session() as session:
             print("登录失败:", response_data['errors'])
     else:
         print("登录失败")
-
-
-while True:
-    user_input = input('请输入exit退出: ')
-    if user_input == 'exit':
-        break
-    else:
-        print("输入错误，请输入'exit'退出")
