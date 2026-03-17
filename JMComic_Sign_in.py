@@ -3,9 +3,9 @@ import json
 import os
 #如果运行报错可能是换域名了，进官网会自动重定向新的域名，把老的换成新的域名后面路径不用改
 #JM 域名：18comic-blackmyth.club/login        ->      18comic-hok.xyz/login
-LOGIN_URL = 'https://18comic-hok.xyz/login'                      # 登录URL
-SIGN_URL = 'https://18comic-hok.xyz/ajax/user_daily_sign'        # 签到URL
-LOGOUT_URL = 'https://18comic-hok.xyz/logout'                    # 退出URL
+LOGIN_URL = 'https://18comic.vip/login'                      # 登录URL
+SIGN_URL = 'https://18comic.vip/ajax/user_daily_sign'        # 签到URL
+LOGOUT_URL = 'https://18comic.vip/logout'                    # 退出URL
 
 # 请求头
 headers = {
@@ -17,6 +17,8 @@ headers = {
 payload = {
     'username': os.getenv('JM_USERNAME', 'username'),
     'password': os.getenv('JM_PASSWORD', 'password'),
+    # 'username': 'pupusc',
+    # 'password': '..52t1314..',
     'submit_login': '1',
 }
 
