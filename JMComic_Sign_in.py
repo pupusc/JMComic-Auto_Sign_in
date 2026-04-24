@@ -85,9 +85,9 @@ with requests.Session() as session:
         print("登录失败")
 
 
-while True:
-    user_input = input('请输入exit退出: ')
-    if user_input == 'exit':
-        break
-    else:
-        print("输入错误，请输入'exit'退出")
+# while True:
+#     user_input = input('请输入exit退出: ')
+#     if user_input == 'exit':
+#         break
+#     else:
+#         print("输入错误，请输入'exit'退出")
