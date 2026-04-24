@@ -1,78 +1,10 @@
-import re
 import requests
 import json
-
-
-def get_domains():
-    """从发布页自动获取所有可用域名"""
-    try:
-        publish_url = 'https://jmcomicne.net/'
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        }
-        response = requests.get(publish_url, headers=headers, timeout=10)
-        response.encoding = 'utf-8'
-
-        domains = []
-
-        # 匹配国际通用网域下的域名
-        pattern_international = r'國際通用網域.*?(18comic\.[a-z]+)'
-        match = re.search(pattern_international, response.text, re.DOTALL)
-        if match:
-            domains.append(match.group(1))
-
-        # 匹配东南亚路线域名
-        pattern_southeast = r'東南亞路線.*?(jmcomic-[a-z]+\.(one|org))'
-        matches = re.findall(pattern_southeast, response.text, re.DOTALL)
-        for match in matches:
-            domains.append(match[0])
-
-        # 匹配内地网域/分流域名
-        pattern_mainland = r'https://(jm18c-[a-z]+\.(cc|me))'
-        matches = re.findall(pattern_mainland, response.text)
-        for match in matches:
-            domains.append(match[0])
-
-        # 去重并保持顺序
-        seen = set()
-        unique_domains = []
-        for domain in domains:
-            if domain not in seen:
-                seen.add(domain)
-                unique_domains.append(domain)
-
-        if unique_domains:
-            print(f"自动获取到 {len(unique_domains)} 个域名: {unique_domains}")
-            return unique_domains
-        else:
-            # 如果匹配失败，使用默认域名列表
-            print("未能自动获取域名，使用默认域名列表")
-            return ['18comic.vip', '18comic.ink']
-    except Exception as e:
-        print(f"获取域名失败: {e}，使用默认域名列表")
-        return ['18comic.vip', '18comic.ink']
-
-
-def test_login(domain, payload, headers):
-    """测试域名是否可以成功登录"""
-    try:
-        login_url = f'https://{domain}/login'
-        with requests.Session() as session:
-            response = session.post(login_url, data=payload, headers=headers, timeout=10)
-
-            if response.status_code == 200:
-                response_data = json.loads(response.text)
-                if response_data.get("status") == 1:
-                    return True, session
-                else:
-                    print(f"域名 {domain} 登录失败: {response_data.get('errors')}")
-                    return False, None
-            else:
-                print(f"域名 {domain} 请求失败，状态码: {response.status_code}")
-                return False, None
-    except Exception as e:
-        print(f"域名 {domain} 连接失败: {e}")
-        return False, None
+#如果运行报错可能是换域名了，进官网会自动重定向新的域名，把老的换成新的域名后面路径不用改
+#JM域名:    18comic-blackmyth.club/login        ->      18comic-hok.xyz/login
+LOGIN_URL = 'https://jm18c-oec.cc/login'                      # 登录URL
+SIGN_URL = 'https://jm18c-oec.cc//ajax/user_daily_sign'        # 签到URL
+LOGOUT_URL = 'https://jm18c-oec.cc//logout'                    # 退出URL
 
 # 请求头
 headers = {
@@ -80,43 +12,12 @@ headers = {
     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
 }
 
-# 用户名和密码 - 优先从环境变量读取，支持 GitHub Actions
+# 用户名和密码
 payload = {
-    # 'username': os.getenv('JM_USERNAME', 'username'),
-    # 'password': os.getenv('JM_PASSWORD', 'password'),
-    'username': 'pupusc',
-    'password': '..52t1314..',
+    'username': 'username',
+    'password': 'password',
     'submit_login': '1',
 }
-
-# 获取所有可用域名
-DOMAINS = get_domains()
-
-
-# 轮询尝试每个域名直到登录成功
-session = None
-success_domain = None
-
-print(f"\n开始轮询尝试 {len(DOMAINS)} 个域名...\n")
-for domain in DOMAINS:
-    print(f"正在尝试域名: {domain}")
-    success, session = test_login(domain, payload, headers)
-
-    if success:
-        success_domain = domain
-        print(f"✓ 域名 {domain} 登录成功！\n")
-        break
-    else:
-        print(f"✗ 域名 {domain} 不可用，尝试下一个...\n")
-
-if not success_domain:
-    print("所有域名都无法登录，请检查账号密码或稍后重试")
-    exit(1)
-
-# 使用成功登录的域名构建URL
-LOGIN_URL = f'https://{success_domain}/login'
-SIGN_URL = f'https://{success_domain}/ajax/user_daily_sign'
-LOGOUT_URL = f'https://{success_domain}/logout'
 
 # 发送登录请求
 with requests.Session() as session:
@@ -182,3 +83,11 @@ with requests.Session() as session:
             print("登录失败:", response_data['errors'])
     else:
         print("登录失败")
+
+
+while True:
+    user_input = input('请输入exit退出: ')
+    if user_input == 'exit':
+        break
+    else:
+        print("输入错误，请输入'exit'退出")
